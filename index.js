@@ -45,12 +45,10 @@ export default function WarCardGame() {
     let card1ValueIndex = valueOptions.indexOf(card1.value);
     let card2ValueIndex = valueOptions.indexOf(card2.value);
     
-    // Reverse mode logic
     if (reverseMode) {
       [card1ValueIndex, card2ValueIndex] = [card2ValueIndex, card1ValueIndex];
     }
     
-    // Handle skip turn from Clubs power-up
     if (skipNextTurn) {
       setSkipNextTurn(false);
       setMyScore(prev => prev + 1);
@@ -59,13 +57,11 @@ export default function WarCardGame() {
     
     let multiplier = 1;
     
-    // Fever Mode
     if (feverCount >= 3) {
       multiplier = 3;
       setFeverCount(0);
     }
     
-    // Diamonds power-up
     if (suitPowerUp === 'DIAMONDS') {
       multiplier *= 2;
       setSuitPowerUp(null);
@@ -77,7 +73,6 @@ export default function WarCardGame() {
       setPrisonerPile(prev => prev + 1);
       setFeverCount(0);
       
-      // Spades power-up - steal point
       if (card1.suit === 'SPADES' && myScore > 0) {
         setMyScore(prev => prev - 1);
         setComputerScore(prev => prev + 1);
@@ -90,10 +85,8 @@ export default function WarCardGame() {
       setMyScore(prev => prev + points);
       setFeverCount(0);
       
-      // Apply suit power-ups for player wins
       applySuitPowerUp(card2.suit);
       
-      // Spades power-up - steal point
       if (card2.suit === 'SPADES' && computerScore > 0) {
         setComputerScore(prev => prev - 1);
         setMyScore(prev => prev + 1);
@@ -111,7 +104,6 @@ export default function WarCardGame() {
       setCardShake(true);
       setTimeout(() => setCardShake(false), 500);
       
-      // War - risk it for prisoners
       if (prisonerPile > 0) {
         const freed = prisonerPile;
         setMyScore(prev => prev + freed * 2);
@@ -179,18 +171,23 @@ export default function WarCardGame() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 p-8 relative overflow-hidden">
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(to bottom right, #25344F, #617891, #632024)',
+      padding: '2rem',
+      position: 'relative',
+      overflow: 'hidden'
+    }}>
       {showConfetti && (
-        <div className="absolute inset-0 pointer-events-none">
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
           {[...Array(50)].map((_, i) => (
             <div
               key={i}
-              className="absolute animate-ping"
               style={{
+                position: 'absolute',
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 0.5}s`,
-                animationDuration: '1s'
+                animation: `ping 1s ease-out ${Math.random() * 0.5}s`
               }}
             >
               {['🎉', '⭐', '✨', '🎊'][Math.floor(Math.random() * 4)]}
@@ -199,108 +196,219 @@ export default function WarCardGame() {
         </div>
       )}
       
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-5xl font-bold text-yellow-400 mb-4 drop-shadow-lg">
+      <div style={{ maxWidth: '1024px', margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <h1 style={{
+            fontSize: '3rem',
+            fontWeight: 'bold',
+            color: '#D5B893',
+            marginBottom: '1rem',
+            textShadow: '0 4px 6px rgba(0,0,0,0.3)'
+          }}>
             {header}
           </h1>
           
-          <div className="flex justify-center gap-4 items-center mb-4">
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', alignItems: 'center', marginBottom: '1rem' }}>
             <button
               onClick={handleNewDeck}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition"
+              style={{
+                backgroundColor: '#617891',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                fontWeight: '600',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#25344F'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#617891'}
             >
               New Deck
             </button>
             <button
               onClick={drawCards}
               disabled={drawDisabled}
-              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-500 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition"
+              style={{
+                backgroundColor: drawDisabled ? '#6b7280' : '#632024',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                fontWeight: '600',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                border: 'none',
+                cursor: drawDisabled ? 'not-allowed' : 'pointer'
+              }}
+              onMouseOver={(e) => !drawDisabled && (e.target.style.backgroundColor = '#6F4D38')}
+              onMouseOut={(e) => !drawDisabled && (e.target.style.backgroundColor = '#632024')}
             >
               Draw Cards
             </button>
             <button
               onClick={() => setReverseMode(!reverseMode)}
-              className={`${reverseMode ? 'bg-purple-600' : 'bg-gray-600'} hover:opacity-80 text-white px-6 py-3 rounded-lg font-semibold shadow-lg transition flex items-center gap-2`}
+              style={{
+                backgroundColor: reverseMode ? '#9333ea' : '#6b7280',
+                color: 'white',
+                padding: '0.75rem 1.5rem',
+                borderRadius: '0.5rem',
+                fontWeight: '600',
+                boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem'
+              }}
             >
               <RotateCcw size={20} />
               {reverseMode ? 'Reverse ON' : 'Normal'}
             </button>
           </div>
           
-          <p className="text-white text-lg">Remaining cards: {remaining}</p>
+          <p style={{ color: 'white', fontSize: '1.125rem' }}>Remaining cards: {remaining}</p>
         </div>
 
         {/* Special Indicators */}
-        <div className="flex justify-center gap-6 mb-6">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           {prisonerPile > 0 && (
-            <div className="bg-red-900 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+            <div style={{
+              backgroundColor: '#991b1b',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
               <Shield size={20} />
-              <span className="font-semibold">Prisoners: {prisonerPile}</span>
+              <span style={{ fontWeight: '600' }}>Prisoners: {prisonerPile}</span>
             </div>
           )}
           
           {feverCount > 0 && (
-            <div className="bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 animate-pulse">
+            <div style={{
+              backgroundColor: '#ea580c',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
+              animation: 'pulse 2s ease-in-out infinite'
+            }}>
               <Flame size={20} />
-              <span className="font-semibold">Fever: {feverCount}/3</span>
+              <span style={{ fontWeight: '600' }}>Fever: {feverCount}/3</span>
             </div>
           )}
           
           {suitPowerUp && (
-            <div className="bg-yellow-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
+            <div style={{
+              backgroundColor: '#ca8a04',
+              color: 'white',
+              padding: '0.5rem 1rem',
+              borderRadius: '0.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem'
+            }}>
               <Zap size={20} />
-              <span className="font-semibold">Next: 2x Points!</span>
+              <span style={{ fontWeight: '600' }}>Next: 2x Points!</span>
             </div>
           )}
         </div>
 
         {/* Cards Display */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
-          <div className="text-center">
-            <div className={`bg-white/10 backdrop-blur rounded-xl p-6 ${cardShake ? 'animate-bounce' : ''}`}>
-              <h3 className="text-2xl font-bold text-red-400 mb-4 flex items-center justify-center gap-2">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
+              animation: cardShake ? 'bounce 0.5s' : 'none'
+            }}>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#ef4444',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
                 💻 Computer
-                {cards[0] && <span className="text-sm">{getSuitIcon(cards[0].suit)}</span>}
+                {cards[0] && <span style={{ fontSize: '0.875rem' }}>{getSuitIcon(cards[0].suit)}</span>}
               </h3>
               {cards[0] ? (
-                <img src={cards[0].image} alt="Computer card" className="w-full rounded-lg shadow-2xl" />
+                <img src={cards[0].image} alt="Computer card" style={{ width: '100%', borderRadius: '0.5rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)' }} />
               ) : (
-                <div className="w-full h-80 bg-green-800 rounded-lg flex items-center justify-center">
-                  <span className="text-6xl">🃏</span>
+                <div style={{
+                  width: '100%',
+                  height: '20rem',
+                  backgroundColor: '#25344F',
+                  borderRadius: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '4rem' }}>🃏</span>
                 </div>
               )}
-              <div className="mt-4 text-white">
-                <p className="text-3xl font-bold">{computerScore}</p>
+              <div style={{ marginTop: '1rem', color: 'white' }}>
+                <p style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>{computerScore}</p>
                 {cards[0] && (
-                  <p className="text-sm text-yellow-300">{getSuitPowerText(cards[0].suit)}</p>
+                  <p style={{ fontSize: '0.875rem', color: '#fcd34d' }}>{getSuitPowerText(cards[0].suit)}</p>
                 )}
               </div>
             </div>
           </div>
 
-          <div className="text-center">
-            <div className={`bg-white/10 backdrop-blur rounded-xl p-6 ${cardShake ? 'animate-bounce' : ''}`}>
-              <h3 className="text-2xl font-bold text-blue-400 mb-4 flex items-center justify-center gap-2">
+          <div style={{ textAlign: 'center' }}>
+            <div style={{
+              backgroundColor: 'rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(10px)',
+              borderRadius: '0.75rem',
+              padding: '1.5rem',
+              animation: cardShake ? 'bounce 0.5s' : 'none'
+            }}>
+              <h3 style={{
+                fontSize: '1.5rem',
+                fontWeight: 'bold',
+                color: '#60a5fa',
+                marginBottom: '1rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.5rem'
+              }}>
                 👤 You
-                {cards[1] && <span className="text-sm">{getSuitIcon(cards[1].suit)}</span>}
+                {cards[1] && <span style={{ fontSize: '0.875rem' }}>{getSuitIcon(cards[1].suit)}</span>}
               </h3>
               {cards[1] ? (
-                <img src={cards[1].image} alt="Your card" className="w-full rounded-lg shadow-2xl" />
+                <img src={cards[1].image} alt="Your card" style={{ width: '100%', borderRadius: '0.5rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.5)' }} />
               ) : (
-                <div className="w-full h-80 bg-green-800 rounded-lg flex items-center justify-center">
-                  <span className="text-6xl">🃏</span>
+                <div style={{
+                  width: '100%',
+                  height: '20rem',
+                  backgroundColor: '#25344F',
+                  borderRadius: '0.5rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <span style={{ fontSize: '4rem' }}>🃏</span>
                 </div>
               )}
-              <div className="mt-4 text-white">
-                <p className="text-3xl font-bold">{myScore}</p>
-                <div className="flex justify-center gap-1 mt-2">
+              <div style={{ marginTop: '1rem', color: 'white' }}>
+                <p style={{ fontSize: '1.875rem', fontWeight: 'bold' }}>{myScore}</p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '0.25rem', marginTop: '0.5rem' }}>
                   {[...Array(lives)].map((_, i) => (
-                    <span key={i} className="text-red-500">❤️</span>
+                    <span key={i} style={{ color: '#ef4444' }}>❤️</span>
                   ))}
                 </div>
                 {cards[1] && (
-                  <p className="text-sm text-yellow-300">{getSuitPowerText(cards[1].suit)}</p>
+                  <p style={{ fontSize: '0.875rem', color: '#fcd34d' }}>{getSuitPowerText(cards[1].suit)}</p>
                 )}
               </div>
             </div>
@@ -308,9 +416,16 @@ export default function WarCardGame() {
         </div>
 
         {/* Power-up Legend */}
-        <div className="bg-white/10 backdrop-blur rounded-lg p-4 text-white text-sm">
-          <h4 className="font-bold mb-2">Suit Powers:</h4>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div style={{
+          backgroundColor: 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(10px)',
+          borderRadius: '0.5rem',
+          padding: '1rem',
+          color: 'white',
+          fontSize: '0.875rem'
+        }}>
+          <h4 style={{ fontWeight: 'bold', marginBottom: '0.5rem' }}>Suit Powers:</h4>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.5rem' }}>
             <div>♥️ Hearts: +1 Life</div>
             <div>♠️ Spades: Steal 1 Point</div>
             <div>♦️ Diamonds: 2x Next Win</div>
@@ -320,10 +435,17 @@ export default function WarCardGame() {
       </div>
 
       <style>{`
-        @keyframes victoryDance {
-          0%, 100% { transform: rotate(0deg); }
-          25% { transform: rotate(5deg); }
-          75% { transform: rotate(-5deg); }
+        @keyframes ping {
+          0% { opacity: 1; transform: scale(1); }
+          100% { opacity: 0; transform: scale(2); }
+        }
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
         }
       `}</style>
     </div>
